@@ -12,6 +12,7 @@ ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
+# Database Connections
 conn = sqlite3.connect('spider.sqlite')
 cur = conn.cursor()
 
