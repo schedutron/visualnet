@@ -1,3 +1,11 @@
 # pagerank2
 
-My PageRank repo, built in Python 2, through help from Python3 implementation by Dr Chuck.
+My site visualization repository built with implementation help by Dr Chuck's tutorials.
+
+ScriptFlow:
+
+1. spider.py
+2. sprank.py
+3. spjson.py
+
+Finally, open the generated force.html.
