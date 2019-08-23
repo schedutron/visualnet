@@ -6,6 +6,7 @@ from urlparse import urljoin, urlparse
 
 from urllib import urlopen
 from bs4 import BeautifulSoup
+import requests
 
 # Ignore SSL certificate errors
 ctx = ssl.create_default_context()
@@ -60,7 +61,7 @@ while True:
         many = int(sval)
     many = many - 1
 
-    cur.execute('SELECT id,url FROM Pages WHERE html is NULL and error is NULL ORDER BY RANDOM() LIMIT 1')
+    cur.execute('SELECT id, url FROM Pages WHERE html is NULL and error is NULL ORDER BY RANDOM() LIMIT 1')
     try:
         row = cur.fetchone()
         # print row
@@ -76,17 +77,17 @@ while True:
     # If we are retrieving this page, there should be no links from it
     cur.execute('DELETE from Links WHERE from_id=?', (fromid, ) )
     try:
-        document = urlopen(url, context=ctx)
+        r = requests.get(url)
 
-        html = document.read()
-        if document.getcode() != 200 :
-            print "Error on page: ",document.getcode()
-            cur.execute('UPDATE Pages SET error=? WHERE url=?', (document.getcode(), url) )
+        html = r.text
+        if not r.ok:
+            print "Error on page:", r.status_code
+            cur.execute('UPDATE Pages SET error=? WHERE url=?', (r.status_code, url))
 
-        if 'text/html' != document.info().getheader('Content-Type').split(";")[0] :
+        if 'text/html' != r.headers.get('Content-Type').split(";")[0] :
             print "\nIgnore non text/html page"
-            cur.execute('DELETE FROM Pages WHERE url=?', ( url, ) )
-            cur.execute('UPDATE Pages SET error=0 WHERE url=?', (url, ) )
+            cur.execute('DELETE FROM Pages WHERE url=?', (url,))
+            cur.execute('UPDATE Pages SET error=0 WHERE url=?', (url,))
             conn.commit()
             continue
 
@@ -103,8 +104,8 @@ while True:
         conn.commit()
         continue
 
-    cur.execute('INSERT OR IGNORE INTO Pages (url, html, new_rank) VALUES ( ?, NULL, 1.0 )', ( url, ) )
-    cur.execute('UPDATE Pages SET html=? WHERE url=?', (str(memoryview(html)), url ) )
+    cur.execute('INSERT OR IGNORE INTO Pages (url, html, new_rank) VALUES ( ?, NULL, 1.0 )', ( url,))
+    cur.execute('UPDATE Pages SET html=? WHERE url=?', (str(memoryview(str(html.encode('utf-8')))), url))
     conn.commit()
 
     # Retrieve all of the anchor tags
@@ -145,7 +146,6 @@ while True:
             continue
         # print fromid, toid
         cur.execute('INSERT OR IGNORE INTO Links (from_id, to_id) VALUES ( ?, ? )', ( fromid, toid ) )
-
 
     print count
 
