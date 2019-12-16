@@ -7,7 +7,7 @@ print("Creating JSON output on spider.js...")
 howmany = int(eval(input("How many nodes? ")))
 
 cur.execute('''SELECT COUNT(from_id) AS inbound, old_rank, new_rank, id, url
-    FROM Pages JOIN Links ON Pages.id = Links.to_id
+    FROM pages JOIN links ON pages.id = links.to_id
     WHERE html IS NOT NULL AND ERROR IS NULL
     GROUP BY id ORDER BY id,inbound''')
 
@@ -42,7 +42,7 @@ for row in nodes :
     count = count + 1
 fhand.write('],\n')
 
-cur.execute('''SELECT DISTINCT from_id, to_id FROM Links''')
+cur.execute('''SELECT DISTINCT from_id, to_id FROM links''')
 fhand.write('"links":[\n')
 
 count = 0

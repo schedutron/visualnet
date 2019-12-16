@@ -5,7 +5,7 @@ cur = conn.cursor()
 
 # Find the ids that send out page rank - we only are interested
 # in pages that have in and out links
-cur.execute('''SELECT DISTINCT from_id FROM Links''')
+cur.execute('''SELECT DISTINCT from_id FROM links''')
 from_ids = list()
 for row in cur:
     from_ids.append(row[0])
@@ -13,7 +13,7 @@ for row in cur:
 # Find the ids that receive page rank
 to_ids = list()
 links = list()
-cur.execute('''SELECT DISTINCT from_id, to_id FROM Links''')
+cur.execute('''SELECT DISTINCT from_id, to_id FROM links''')
 for row in cur:
     from_id = row[0]
     to_id = row[1]
@@ -26,7 +26,7 @@ for row in cur:
 # Get latest page ranks for strongly connected component
 prev_ranks = dict()
 for node in from_ids:
-    cur.execute('''SELECT new_rank FROM Pages WHERE id = ?''', (node, ))
+    cur.execute('''SELECT new_rank FROM pages WHERE id = ?''', (node, ))
     row = cur.fetchone()
     prev_ranks[node] = row[0]
 
@@ -95,8 +95,8 @@ for i in range(many):
 
 # Put the final ranks back into the database
 print(list(next_ranks.items())[:5])
-cur.execute('''UPDATE Pages SET old_rank=new_rank''')
+cur.execute('''UPDATE pages SET old_rank=new_rank''')
 for (id, new_rank) in list(next_ranks.items()) :
-    cur.execute('''UPDATE Pages SET new_rank=? WHERE id=?''', (new_rank, id))
+    cur.execute('''UPDATE pages SET new_rank=? WHERE id=?''', (new_rank, id))
 conn.commit()
 cur.close()
