@@ -2,9 +2,8 @@
 import sqlite3
 #import urllib.error
 import ssl
-from urlparse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 
-from urllib import urlopen
 from bs4 import BeautifulSoup
 import requests
 
@@ -30,9 +29,9 @@ cur.execute('''CREATE TABLE IF NOT EXISTS Webs (url TEXT UNIQUE)''')
 cur.execute('SELECT id,url FROM Pages WHERE html is NULL and error is NULL ORDER BY RANDOM() LIMIT 1')
 row = cur.fetchone()
 if row is not None:
-    print "Restarting existing crawl.  Remove spider.sqlite to start a fresh crawl."
+    print("Restarting existing crawl.  Remove spider.sqlite to start a fresh crawl.")
 else :
-    starturl = raw_input('Enter web url or press enter: ')
+    starturl = input('Enter web url or press enter: ')
     if ( len(starturl) < 1 ) : starturl = 'http://www.dr-chuck.com/'
     if ( starturl.endswith('/') ) : starturl = starturl[:-1]
     web = starturl
@@ -51,12 +50,12 @@ webs = list()
 for row in cur:
     webs.append(str(row[0]))
 
-print webs
+print(webs)
 
 many = 0
 while True:
     if ( many < 1 ) :
-        sval = raw_input('How many pages:')
+        sval = input('How many pages:')
         if ( len(sval) < 1 ) : break
         many = int(sval)
     many = many - 1
@@ -68,11 +67,11 @@ while True:
         fromid = row[0]
         url = row[1]
     except:
-        print 'No unretrieved HTML pages found'
+        print('No unretrieved HTML pages found')
         many = 0
         break
 
-    print fromid, url,
+    print(fromid, url, end=' ')
 
     # If we are retrieving this page, there should be no links from it
     cur.execute('DELETE from Links WHERE from_id=?', (fromid, ) )
@@ -81,31 +80,31 @@ while True:
 
         html = r.text
         if not r.ok:
-            print "Error on page:", r.status_code
+            print("Error on page:", r.status_code)
             cur.execute('UPDATE Pages SET error=? WHERE url=?', (r.status_code, url))
 
         if 'text/html' != r.headers.get('Content-Type').split(";")[0] :
-            print "\nIgnore non text/html page"
+            print("\nIgnore non text/html page")
             cur.execute('DELETE FROM Pages WHERE url=?', (url,))
             cur.execute('UPDATE Pages SET error=0 WHERE url=?', (url,))
             conn.commit()
             continue
 
-        print '('+str(len(html))+')'
+        print('('+str(len(html))+')')
 
         soup = BeautifulSoup(html, "html.parser")
     except KeyboardInterrupt:
-        print
-        print'Program interrupted by user...'
+        print()
+        print('Program interrupted by user...')
         break
     except:
-        print "Unable to retrieve or parse page"
+        print("Unable to retrieve or parse page")
         cur.execute('UPDATE Pages SET error=-1 WHERE url=?', (url, ) )
         conn.commit()
         continue
 
     cur.execute('INSERT OR IGNORE INTO Pages (url, html, new_rank) VALUES ( ?, NULL, 1.0 )', ( url,))
-    cur.execute('UPDATE Pages SET html=? WHERE url=?', (str(memoryview(str(html.encode('utf-8')))), url))
+    cur.execute('UPDATE Pages SET html=? WHERE url=?', (str(memoryview(html.encode('utf-8'))), url))
     conn.commit()
 
     # Retrieve all of the anchor tags
@@ -142,11 +141,11 @@ while True:
             row = cur.fetchone()
             toid = row[0]
         except:
-            print 'Could not retrieve id'
+            print('Could not retrieve id')
             continue
         # print fromid, toid
         cur.execute('INSERT OR IGNORE INTO Links (from_id, to_id) VALUES ( ?, ? )', ( fromid, toid ) )
 
-    print count
+    print(count)
 
 cur.close()

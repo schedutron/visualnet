@@ -30,13 +30,13 @@ for node in from_ids:
     row = cur.fetchone()
     prev_ranks[node] = row[0]
 
-sval = raw_input('How many iterations:')
+sval = input('How many iterations:')
 many = 1
 if ( len(sval) > 0 ) : many = int(sval)
 
 # Sanity check
 if len(prev_ranks) < 1 :
-    print "Nothing to page rank.  Check data."
+    print("Nothing to page rank.  Check data.")
     quit()
 
 # Lets do Page Rank in memory so it is really fast
@@ -88,13 +88,13 @@ for i in range(many):
         totdiff = totdiff + diff
 
     avediff = totdiff / len(prev_ranks)
-    print(i+1, avediff)
+    print((i+1, avediff))
 
     # rotate
     prev_ranks = next_ranks
 
 # Put the final ranks back into the database
-print list(next_ranks.items())[:5]
+print(list(next_ranks.items())[:5])
 cur.execute('''UPDATE Pages SET old_rank=new_rank''')
 for (id, new_rank) in list(next_ranks.items()) :
     cur.execute('''UPDATE Pages SET new_rank=? WHERE id=?''', (new_rank, id))

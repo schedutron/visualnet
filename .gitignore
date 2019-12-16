@@ -1,2 +1,4 @@
 spider.js
 *.sqlite
+.vscode/
+venv/
