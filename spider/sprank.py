@@ -1,7 +1,11 @@
-import sqlite3
+import sys
 from app import db
 
-domain = input("Enter the domain to perform pagerank on: ")
+if len(sys.argv) < 3:
+    print("Usage: python3 -m spider.sprank http://some.doma.in num_iterations")
+    quit()
+domain, num_iterations = sys.argv[1], int(sys.argv[2])
+
 
 res = db.session.execute("SELECT id FROM webs where url = :wu", {"wu": domain})
 try:
@@ -43,9 +47,7 @@ res = db.session.execute(
 prev_ranks = {row[0]: row[1] for row in res}
 
 
-sval = input('How many iterations: ')
-many = 1
-if ( len(sval) > 0 ) : many = int(sval)
+if num_iterations < 1: num_iterations = 1
 
 # Sanity check
 if len(prev_ranks) < 1 :
@@ -53,7 +55,7 @@ if len(prev_ranks) < 1 :
     quit()
 
 # Lets do Page Rank in memory so it is really fast
-for i in range(many):
+for i in range(num_iterations):
     # print prev_ranks.items()[:5]
     next_ranks = dict();
     total = 0.0
@@ -108,7 +110,13 @@ for i in range(many):
 
 # Put the final ranks back into the database
 print(list(next_ranks.items())[:5])
-db.session.execute('''UPDATE pages SET old_rank=new_rank WHERE web_id = :wi''', {"wi": web_id})
+db.session.execute(
+    '''UPDATE pages SET old_rank=new_rank WHERE web_id = :wi''',
+    {"wi": web_id}
+    )
 for (id, new_rank) in list(next_ranks.items()) :
-    db.session.execute('''UPDATE pages SET new_rank=:nr WHERE id=:id''', {"nr": new_rank, "id": id})
+    db.session.execute(
+        '''UPDATE pages SET new_rank=:nr WHERE id=:id''',
+        {"nr": new_rank, "id": id}
+    )
 db.session.commit()

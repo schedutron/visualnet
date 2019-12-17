@@ -1,7 +1,6 @@
 # Main Script
-import psycopg2
-#import urllib.error
 import ssl
+import sys
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
@@ -9,8 +8,12 @@ import requests
 from sqlalchemy.exc import IntegrityError
 from app import db
 
+if len(sys.argv) < 3:
+    print("Usage: python3 -m spider.spider http://some.doma.in num_pages")
+    quit()
+web_url_top, num_pages = sys.argv[1], int(sys.argv[2])
 
-web_url_top = input("Enter web url: ")
+
 if len(web_url_top) < 1:
     web_url_top = "http://lnmiit.ac.in"
 if ( web_url_top.endswith('/') ) : web_url_top = web_url_top[:-1]
@@ -45,13 +48,9 @@ except StopIteration:
 res = db.session.execute('SELECT id, url FROM webs WHERE url = :wut', {'wut': web_url_top})
 web_id, web_url_top = next(res)
 
-many = 0
-while True:
-    if ( many < 1 ) :
-        sval = input('How many pages:')
-        if ( len(sval) < 1 ) : break
-        many = int(sval)
-    many = many - 1
+if num_pages < 1:
+    num_pages = 1
+for _ in range(num_pages):
 
     res = db.session.execute('SELECT id, url FROM pages WHERE html is NULL and error is NULL AND web_id = :wi ORDER BY RANDOM() LIMIT 1', {'wi': web_id})
     try:
@@ -61,7 +60,6 @@ while True:
         url = row[1]
     except:
         print('No unretrieved HTML pages found')
-        many = 0
         break
 
     print(fromid, url, end=' ')

@@ -1,13 +1,16 @@
-import sqlite3
+import sys
 from app import db
 
-domain = input("Enter the domain for JSON generation: ")
+if len(sys.argv) < 2:
+    print("Usage: python3 -m spider.spjson http://some.doma.in")
+    quit()
+domain = sys.argv[1]
 
 res = db.session.execute("SELECT id FROM webs where url = :wu", {"wu": domain})
 try:
     web_id = next(res)[0]
 except StopIteration:
-    print("No such domain found in database")
+    print(f"No such domain found in database: {domain}")
     quit()
 
 
