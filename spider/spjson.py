@@ -1,21 +1,29 @@
 import sqlite3
+from app import db
 
-conn = sqlite3.connect('spider.sqlite')
-cur = conn.cursor()
+domain = input("Enter the domain for JSON generation: ")
+
+res = db.session.execute("SELECT id FROM webs where url = :wu", {"wu": domain})
+try:
+    web_id = next(res)[0]
+except StopIteration:
+    print("No such domain found in database")
+    quit()
+
 
 print("Creating JSON output on spider.js...")
 howmany = int(eval(input("How many nodes? ")))
 
-cur.execute('''SELECT COUNT(from_id) AS inbound, old_rank, new_rank, id, url
+res = db.session.execute('''SELECT COUNT(from_id) AS inbound, old_rank, new_rank, id, url
     FROM pages JOIN links ON pages.id = links.to_id
-    WHERE html IS NOT NULL AND ERROR IS NULL
-    GROUP BY id ORDER BY id,inbound''')
+    WHERE html IS NOT NULL AND ERROR IS NULL AND web_id = :wi
+    GROUP BY id ORDER BY id,inbound''', {"wi": web_id})
 
-fhand = open('spider.js','w')
+fhand = open('spider/spider.js','w')
 nodes = list()
 maxrank = None
 minrank = None
-for row in cur :
+for row in res :
     nodes.append(row)
     rank = row[2]
     if maxrank is None or maxrank < rank: maxrank = rank
@@ -42,11 +50,14 @@ for row in nodes :
     count = count + 1
 fhand.write('],\n')
 
-cur.execute('''SELECT DISTINCT from_id, to_id FROM links''')
+res = db.session.execute(
+    '''SELECT DISTINCT from_id, to_id FROM links, pages WHERE links.to_id = pages.id AND pages.web_id = :wi''',
+    {"wi": web_id}
+)
 fhand.write('"links":[\n')
 
 count = 0
-for row in cur :
+for row in res:
     # print row
     if row[0] not in map or row[1] not in map : continue
     if count > 0 : fhand.write(',\n')
@@ -56,6 +67,5 @@ for row in cur :
     count = count + 1
 fhand.write(']};')
 fhand.close()
-cur.close()
 
 print("Open force.html in a browser to view the visualization")

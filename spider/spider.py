@@ -1,52 +1,49 @@
 # Main Script
-import sqlite3
+import psycopg2
 #import urllib.error
 import ssl
 from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 import requests
+from sqlalchemy.exc import IntegrityError
+from app import db
 
 
-# Database Connections
-conn = sqlite3.connect('spider.sqlite')
-cur = conn.cursor()
-
-cur.execute('''CREATE TABLE IF NOT EXISTS Pages
-    (id INTEGER PRIMARY KEY, url TEXT UNIQUE, html TEXT,
-     error INTEGER, old_rank REAL, new_rank REAL)''')
-
-cur.execute('''CREATE TABLE IF NOT EXISTS Links
-    (from_id INTEGER, to_id INTEGER)''')
-
-cur.execute('''CREATE TABLE IF NOT EXISTS Webs (url TEXT UNIQUE)''')
+web_url_top = input("Enter web url: ")
+if len(web_url_top) < 1:
+    web_url_top = "http://lnmiit.ac.in"
+if ( web_url_top.endswith('/') ) : web_url_top = web_url_top[:-1]
 
 # Check to see if we are already in progress...
-cur.execute('SELECT id,url FROM Pages WHERE html is NULL and error is NULL ORDER BY RANDOM() LIMIT 1')
-row = cur.fetchone()
-if row is not None:
-    print("Restarting existing crawl.  Remove spider.sqlite to start a fresh crawl.")
-else :
-    starturl = input('Enter web url or press enter: ')
-    if ( len(starturl) < 1 ) : starturl = 'http://www.dr-chuck.com/'
-    if ( starturl.endswith('/') ) : starturl = starturl[:-1]
-    web = starturl
-    if ( starturl.endswith('.htm') or starturl.endswith('.html') ) :
-        pos = starturl.rfind('/')
-        web = starturl[:pos]
+res = db.session.execute('SELECT id, url FROM webs WHERE url = :wut', {'wut': web_url_top})
+try:
+    web_id, web_url_top = next(res)
+    print("Restarting existing crawl.")
+except StopIteration:
+    web = web_url_top.split('/')[2]
+    web = web_url_top[:web_url_top.find(web)+len(web)]
 
-    if ( len(web) > 1 ) :
-        cur.execute('INSERT OR IGNORE INTO Webs (url) VALUES ( ? )', ( web, ) )
-        cur.execute('INSERT OR IGNORE INTO Pages (url, html, new_rank) VALUES ( ?, NULL, 1.0 )', ( starturl, ) )
-        conn.commit()
+    if len(web) > 1:
+        # INSERT OR IGNORE...
+        try:
+            db.session.execute('INSERT INTO webs (url) VALUES (:web)', {'web': web})
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
 
-# Get the current webs
-cur.execute('''SELECT url FROM Webs''')
-webs = list()
-for row in cur:
-    webs.append(str(row[0]))
+        res = db.session.execute('SELECT id FROM webs WHERE url = :web', {'web': web})
+        web_id = next(res)[0]
 
-print(webs)
+        try:
+            db.session.execute('INSERT INTO pages (url, html, new_rank, web_id) VALUES (:web, NULL, 1.0, :wi)', {'web': web, 'wi': web_id})
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+
+res = db.session.execute('SELECT id, url FROM webs WHERE url = :wut', {'wut': web_url_top})
+web_id, web_url_top = next(res)
 
 many = 0
 while True:
@@ -56,10 +53,10 @@ while True:
         many = int(sval)
     many = many - 1
 
-    cur.execute('SELECT id, url FROM Pages WHERE html is NULL and error is NULL ORDER BY RANDOM() LIMIT 1')
+    res = db.session.execute('SELECT id, url FROM pages WHERE html is NULL and error is NULL AND web_id = :wi ORDER BY RANDOM() LIMIT 1', {'wi': web_id})
     try:
-        row = cur.fetchone()
-        # print row
+        row = next(res)
+        #print(row)
         fromid = row[0]
         url = row[1]
     except:
@@ -70,20 +67,22 @@ while True:
     print(fromid, url, end=' ')
 
     # If we are retrieving this page, there should be no links from it
-    cur.execute('DELETE from Links WHERE from_id=?', (fromid, ) )
+    db.session.execute('DELETE from links WHERE from_id=:fi', {'fi': fromid})
+    db.session.commit()
     try:
         r = requests.get(url)
 
         html = r.text
         if not r.ok:
             print("Error on page:", r.status_code)
-            cur.execute('UPDATE Pages SET error=? WHERE url=?', (r.status_code, url))
+            db.session.execute('UPDATE pages SET error= :sc WHERE url= :url', {'sc': r.status_code, 'url': url})
+            db.session.commit()
 
-        if 'text/html' != r.headers.get('Content-Type').split(";")[0] :
+        if 'text/html' != r.headers.get('Content-Type').split(";")[0]:
             print("\nIgnore non text/html page")
-            cur.execute('DELETE FROM Pages WHERE url=?', (url,))
-            cur.execute('UPDATE Pages SET error=0 WHERE url=?', (url,))
-            conn.commit()
+            db.session.execute('DELETE FROM pages WHERE url=:url', {'url': url})
+            db.session.execute('UPDATE pages SET error=0 WHERE url=:url', {'url': url})
+            db.session.commit()
             continue
 
         print('('+str(len(html))+')')
@@ -95,13 +94,18 @@ while True:
         break
     except:
         print("Unable to retrieve or parse page")
-        cur.execute('UPDATE Pages SET error=-1 WHERE url=?', (url, ) )
-        conn.commit()
+        db.session.execute('UPDATE pages SET error=-1 WHERE url=:url', {'url': url})
+        db.session.commit()
         continue
 
-    cur.execute('INSERT OR IGNORE INTO Pages (url, html, new_rank) VALUES ( ?, NULL, 1.0 )', ( url,))
-    cur.execute('UPDATE Pages SET html=? WHERE url=?', (str(memoryview(html.encode('utf-8'))), url))
-    conn.commit()
+    try:
+        db.session.execute('INSERT INTO pages (url, html, new_rank, web_id) VALUES ( :url, NULL, 1.0, :wi)', {'url': url, 'wi': web_id})
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+
+    db.session.execute('UPDATE pages SET html=:html WHERE url=:url', {'html': str(memoryview(html.encode('utf-8'))), 'url': url})
+    db.session.commit()
 
     # Retrieve all of the anchor tags
     tags = soup('a')
@@ -120,28 +124,32 @@ while True:
         # print href
         if ( len(href) < 1 ) : continue
 
-		# Check if the URL is in any of the webs
-        found = False
-        for web in webs:
-            if ( href.startswith(web) ) :
-                found = True
-                break
-        if not found : continue
+		# Check if the URL is in the web
+        domain = web_url_top.split('/')[2]
+        if web_url_top not in href:
+            continue
 
-        cur.execute('INSERT OR IGNORE INTO Pages (url, html, new_rank) VALUES ( ?, NULL, 1.0 )', ( href, ) )
-        count = count + 1
-        conn.commit()
-
-        cur.execute('SELECT id FROM Pages WHERE url=? LIMIT 1', ( href, ))
         try:
-            row = cur.fetchone()
+            db.session.execute('INSERT INTO pages (url, html, new_rank, web_id) VALUES ( :url, NULL, 1.0, :wi)', {'url': href, 'wi': web_id})
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+
+        count = count + 1
+
+        res = db.session.execute('SELECT id FROM pages WHERE url=:url LIMIT 1', {'url': href})
+        try:
+            row = next(res)
             toid = row[0]
         except:
             print('Could not retrieve id')
             continue
-        # print fromid, toid
-        cur.execute('INSERT OR IGNORE INTO Links (from_id, to_id) VALUES ( ?, ? )', ( fromid, toid ) )
+
+        try:
+            # print fromid, toid
+            db.session.execute('INSERT INTO links (from_id, to_id) VALUES (:fi, :ti)', {'fi': fromid, 'ti': toid})
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
 
     print(count)
-
-cur.close()

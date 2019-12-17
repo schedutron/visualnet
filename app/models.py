@@ -1,3 +1,4 @@
+from sqlalchemy.orm import backref
 from sqlalchemy.schema import PrimaryKeyConstraint
 from app import db
 
@@ -19,6 +20,7 @@ class Page(db.Model):
     html = db.Column(db.Text)
     error = db.Column(db.Integer)
     old_rank = db.Column(db.Float)
+    new_rank = db.Column(db.Float)
     web_id = db.Column(db.Integer, db.ForeignKey("webs.id"))
 
     def __repr__(self):
@@ -28,12 +30,12 @@ class Page(db.Model):
 class Link(db.Model):
     __tablename__ = "links"
     from_id = db.Column(db.Integer, db.ForeignKey("pages.id"))
-    to_id = db.Column(db.Integer, db.ForeignKey("pages.id"))
+    to_id = db.Column(db.Integer, db.ForeignKey("pages.id", ondelete='CASCADE'))
 
     __table_args__ = (PrimaryKeyConstraint(from_id, to_id),)
 
     from_url = db.relationship("Page", foreign_keys=[from_id])
-    to_url = db.relationship("Page", foreign_keys=[to_id])
+    to_url = db.relationship("Page", foreign_keys=[to_id], backref=backref("successors", passive_deletes=True))
 
     def __repr__(self):
         return f"<Link from {self.from_url} -to-> {self.to_url}>"
