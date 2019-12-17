@@ -8,3 +8,4 @@ env/
 *.graph
 iitb_network.model
 node_modules/
+*.pyc

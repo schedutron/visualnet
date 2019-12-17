@@ -1,29 +1,34 @@
-from flask import render_template, flash, redirect, url_for
+#!/usr/bin/env python
+from flask import render_template, flash, redirect, url_for, request
+from subprocess import check_call, Popen, call
+import re, os, sys
+
 from app import app
-from app.forms import LoginForm
+from app.spider.spider import spider_func
+from app.spider.sprank import sprank_func
+from app.spider.spjson import spjson_func
+from app.spider.spider_node import spider_node_func
+
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET', 'POST'])
 def index():
-    user = {'username': 'Miguel'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', user=user, posts=posts)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Login requested for user {}, remember_me={}'.format(
-            form.username.data, form.remember_me.data))
-        return redirect(url_for('index'))
-    return render_template('login.html', title='Sign In', form=form)
+    if request.method == 'POST':
+        web_url = request.form["webUrl"]
+        num_pages = request.form["numPages"]
+        num_iter = request.form["iterno"]
+        web_url_node = request.form["webUrlnode"]
+        perpexi = request.form["perp"]
+        if web_url:
+            spider_func(web_url, num_pages)
+            sprank_func(domain=web_url, num_iterations=num_iter)
+            spjson_func(domain=web_url)
+            return render_template('index.html', title='Home', result=False)
+        elif web_url_node:
+            spider_node_func(domain=web_url_node, perpex=perpexi)
+            return render_template('index.html', title='Home', result=True)
+        else:
+            error = 'Please try again! Not a valid Web URL'
+            return render_template('index.html', error=error)
+    else:
+        return render_template('index.html', result=False)

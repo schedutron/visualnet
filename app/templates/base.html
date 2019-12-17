@@ -1,27 +1,18 @@
 <html>
     <head>
-        {% if title %}
-        <title>{{ title }} - microblog</title>
-        {% else %}
-        <title>microblog</title>
-        {% endif %}
+      <title>The Visual Net</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+      <script type="text/javascript" src="/static/d3.v2.js"></script>
+      <link type="text/css" rel="stylesheet" href="/static/force.css"/>
     </head>
     <body>
-        <div>
-            Microblog:
-            <a href="/index">Home</a>
-            <a href="/login">Login</a>
-        </div>
+        <div class="ui container">
+        <div class="ui basic segment"></div>
+        <h1 class="ui header"><a href="/index">Home</a></h1>
         <hr>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
+        <div class="ui basic segment"></div>
         {% block content %}{% endblock %}
+        </div>
     </body>
 </html>
