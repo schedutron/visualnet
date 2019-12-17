@@ -5,3 +5,6 @@ venv/
 .DS_Store
 __pycache__/
 env/
+*.graph
+iitb_network.model
+node_modules/

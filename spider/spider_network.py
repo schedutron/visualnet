@@ -19,7 +19,7 @@ class NodeEmbed():
         for link in links:
             from_id, to_id = link
             directed_graph.add_edge(from_id, to_id)
-        
+
         # Precompute Probabilities and generate walks
         node_vec = Node2Vec(directed_graph)
 

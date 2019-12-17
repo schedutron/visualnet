@@ -1,0 +1,25 @@
+{
+  "name": "btp",
+  "version": "1.0.0",
+  "description": "The web visualizer",
+  "main": "spider.py",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/schedutron/pagerank2.git"
+  },
+  "keywords": [
+    "visualization"
+  ],
+  "author": "schedutron",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/schedutron/pagerank2/issues"
+  },
+  "homepage": "https://github.com/schedutron/pagerank2#readme",
+  "dependencies": {
+    "d3-force-3d": "^2.0.3"
+  }
+}
