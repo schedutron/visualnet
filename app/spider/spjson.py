@@ -8,7 +8,7 @@ if len(sys.argv) < 2:
 domain = sys.argv[1]
 """
 
-def spjson_func(domain):
+def spjson_func(domain, howmany):
     res = db.session.execute("SELECT id FROM webs where url = :wu", {"wu": domain})
     try:
         web_id = next(res)[0]
@@ -18,7 +18,6 @@ def spjson_func(domain):
 
 
     print("Creating JSON output on spider.js...")
-    howmany = int(eval(input("How many nodes? ")))
 
     res = db.session.execute('''SELECT COUNT(from_id) AS inbound, old_rank, new_rank, id, url
         FROM pages JOIN links ON pages.id = links.to_id

@@ -2,33 +2,20 @@
 
 {% block content %}
     <div class="ui container">
-        <div class="ui raised segment">
-
-            <h1 class="ui center aligned header">The Visual Net</h1>
-            {% if error %}
-                <div class="ui error message">
-                    <div class="header">Action Forbidden</div>
-                    <p>{{ error }}</p>
-                </div>
-            {% endif %}
-            <form class="ui form success" action="/index" method="post">
-                    <label>Enter a Web URL</label>
-                    <p><input type="url" id="webUrl" name="webUrl" required/></p>
-                    <label>Enter no. of Pages</label>
-                    <p><input type="number" id="numPages" name="numPages" required/></p>
-                    <label>Enter no. of Iterations</label>
-                    <p><input type="number" id="iterno" name="iterno" required/></p>
-                    <div class="ui basic segment"></div>
-                    <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
-            </form>
-            {% if success %}
-                <div class="ui success message">
-                    <div class="header">Form Completed</div>
-                    <div class="ui active inverted dimmer">
-                        <div class="ui large text loader">Please wait for results</div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div id="alert" class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </div>
+                {% endfor %}
             {% endif %}
+        {% endwith %}
+        <div class="ui raised segment">
+            <h1 class="ui center aligned header">The Visual Net</h1>
             {% if result %}
                 <div class="ui container">
                     <script>
@@ -41,12 +28,43 @@
                     <p><input type="url" id="webUrlnode" name="webUrlnode" required/></p>
                     <label>Enter Perpexipility</label>
                     <p><input type="number" id="perp" name="perp" required/></p>
+                    <label>Enter Embedding dimensions</label>
+                    <p><input type="number" id="emb" name="emb" required/></p>
+                    <label>Enter Number of nodes in each walk</label>
+                    <p><input type="number" id="node" name="node" required/></p>
+                    <label>Enter Number of walks per node</label>
+                    <p><input type="number" id="walk" name="walk" required/></p>
                     <div class="ui basic segment"></div>
                     <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
                 </form>
                 <button class="ui green button" onclick="window.location.href='/'">Check Another Visual Net</button>
             {% else %}
-                <button class="ui green button" onclick="window.location.href='/'">Check Another Visual Net</button>
+                <form class="ui form success" action="/index" method="post">
+                    <label>Enter a Web URL</label>
+                    <p><input type="url" id="webUrl" name="webUrl" required/></p>
+                    <label>Enter no. of Pages</label>
+                    <p><input type="number" id="numPages" name="numPages" required/></p>
+                    <label>Enter no. of Iterations</label>
+                    <p><input type="number" id="iterno" name="iterno" required/></p>
+                    <label>Enter no. of Nodes</label>
+                    <p><input type="number" id="itno" name="itno" required/></p>
+                    <div class="ui basic segment"></div>
+                    <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
+                </form>
+            {% endif %}
+            {% if error %}
+                <div class="ui error message">
+                    <div class="header">Action Forbidden</div>
+                    <p>{{ error }}</p>
+                </div>
+            {% endif %}
+            {% if success %}
+                <div class="ui success message">
+                    <div class="header">Form Completed</div>
+                    <div class="ui active inverted dimmer">
+                        <div class="ui large text loader">Please wait for results</div>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

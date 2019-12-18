@@ -1,12 +1,23 @@
 <html>
     <head>
       <title>The Visual Net</title>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+      <link rel="stylesheet" type="text/javascript" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.js">
+      <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
       <script type="text/javascript" src="/static/d3.v2.js"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> 
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> 
       <link type="text/css" rel="stylesheet" href="/static/force.css"/>
     </head>
     <body>
+        <script>
+          $(document).ready(function(){
+              setTimeout(function() {
+                  $('#alert').fadeOut('fast');
+              }, 3000);
+          });
+        </script>
         <div class="ui container">
         <div class="ui basic segment"></div>
         <h1 class="ui header"><a href="/index">Home</a></h1>
@@ -14,5 +25,6 @@
         <div class="ui basic segment"></div>
         {% block content %}{% endblock %}
         </div>
+
     </body>
 </html>
