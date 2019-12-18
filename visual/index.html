@@ -2,9 +2,10 @@
     <style> body { margin: 0; } </style>
   
     <script src="http://unpkg.com/3d-force-graph"></script>
+    <script src="../spider/spiderFull.js"></script>
     <!--<script src="../../dist/3d-force-graph.js"></script>-->
 </head>
-  
+
 <body>
     <div id="3d-graph"></div>
 
@@ -13,24 +14,28 @@
       const NODES = 300;
       const GROUPS = 12;
 
-      const gData = {
-        nodes: [...Array(NODES).keys()].map(i => ({
-          id: i,
-          group: Math.ceil(Math.random() * GROUPS)
-        })),
-        links: [...Array(NODES).keys()]
-          .filter(id => id)
-          .map(id => ({
-            source: id,
-            target: Math.round(Math.random() * (id-1))
-          }))
-      }
-      const Graph = ForceGraph3D()
-        (document.getElementById('3d-graph'))
-          .nodeAutoColorBy('group')
-          .linkAutoColorBy(d => gData.nodes[d.source].group)
-          .linkOpacity(0.5)
-          .graphData(gData);
-    </script>
+      // const gData = {
+      //   nodes: [...Array(NODES).keys()].map(i => ({
+      //     id: i,
+      //     group: Math.ceil(Math.random() * GROUPS)
+      //   })),
+      //   links: [...Array(NODES).keys()]
+      //     .filter(id => id)
+      //     .map(id => ({
+      //       source: id,
+      //       target: Math.round(Math.random() * (id-1))
+      //     }))
+      // }
+      const gData = spiderJson;
 
+      // gData["links"] = gData["links"].map(link => ({
+      //   source: gData.nodes[link.source],
+      //   target: gData.nodes[link.target],
+      //   value: link.value
+      // }));
+
+      const Graph = ForceGraph3D()
+      (document.getElementById('3d-graph'))
+        .graphData(gData);
+    </script>
 </body>

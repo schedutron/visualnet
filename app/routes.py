@@ -14,11 +14,11 @@ from app.spider.spider_node import spider_node_func
 @app.route('/index', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        web_url = request.form["webUrl"]
-        num_pages = request.form["numPages"]
-        num_iter = request.form["iterno"]
-        web_url_node = request.form["webUrlnode"]
-        perpexi = request.form["perp"]
+        web_url = request.form["webUrl"] or None
+        num_pages = request.form["numPages"] or None
+        num_iter = request.form["iterno"] or None
+        web_url_node = request.form["webUrlnode"] or None
+        perpexi = request.form["perp"] or None
         if web_url:
             spider_func(web_url, num_pages)
             sprank_func(domain=web_url, num_iterations=num_iter)

@@ -20,6 +20,9 @@
   },
   "homepage": "https://github.com/schedutron/pagerank2#readme",
   "dependencies": {
-    "d3-force-3d": "^2.0.3"
+    "d3-force-3d": "^2.0.3",
+    "ngraph.graph": "^19.0.1",
+    "ngraph.offline.layout": "^1.1.1",
+    "ngraph.tobinary": "^1.0.2"
   }
 }
