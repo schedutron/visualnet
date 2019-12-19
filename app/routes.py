@@ -44,7 +44,7 @@ def index():
                             window_size=window_size
                         )
             flash('Embedings Computed, Processing Visualizations!', 'success')
-            get_viz(web_url_node, g, model, perplex=perplex)
+            get_viz(url=web_url_node, g=g, model=model, perplexity=perplex)
             file_path = web_url_node.split('/')[2]
             return render_template('index.html', title='Home', result=True, graph_show=True, file_path=file_path)
         except KeyError:
