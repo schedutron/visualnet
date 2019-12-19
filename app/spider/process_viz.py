@@ -35,7 +35,7 @@ def get_viz(url, g, model, perplexity=20):
     dom = url.split('/')[2]
     fname = f"app/static/{dom}.spiderFull.js"
     with open(f"{fname}", "w") as f:
-        f.write("spiderJson = ")
+        f.write("spiderJsonFull = ")
         f.write(json.dumps(spider_json_full, indent=2))
         f.write(";")
     print(f"3D layout file saved to {fname}")

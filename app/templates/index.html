@@ -14,20 +14,20 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <div class="ui segment">
+        <div class="ui tertiary teal inverted segment">
             <h1 class="ui center aligned header">The Visual Net</h1>
             {% if result %}
                 <script type="text/javascript" src="/static/d3.v2.js"></script>
                 <script type="text/javascript" src="/static/spider.js"></script>
                 <link type="text/css" rel="stylesheet" href="/static/force.css"/>
-                <div id="chart" class="ui raised segment">
+                <div id="chart" class="ui inverted segment">
                     <script type="text/javascript">
                         document.write("<h3 class='ui center aligned header'>Domain: "+ spiderJson.nodes[0].url +"</h3>");
                     </script>
                 </div>
                 <script type="text/javascript" src="/static/force.js"></script>
 
-                <div class="ui raised segment">
+                <div class="ui raised green segment">
                     <h2 class="ui center aligned header">Hyperparameters to compute embeddings</h2>
                     <div class="ui basic segment"></div>
                     <form class="ui form success" action="/index" method="post">
@@ -41,13 +41,28 @@
                         <p><input type="number" id="node" name="node" required/></p>
                         <label>Enter Number of walks per node</label>
                         <p><input type="number" id="walk" name="walk" required/></p>
+                        <label>Enter Window size for skip gram</label>
+                        <p><input type="number" id="window_size" name="window_size" required/></p>
                         <div class="ui basic segment"></div>
                         <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
                     </form>
                     <button class="ui green button" onclick="window.location.href='/'">Check Another Visual Net</button>
                 </div>
+                {% if graph_show %}
+                <div class="ui inverted segment">
+                    <script src="http://unpkg.com/3d-force-graph"></script>
+                    <script src="/static/{{file_path}}.spiderFull.js"></script>
+                    <link type="text/css" rel="stylesheet" href="/static/style.css"/>
+                    <script type="text/javascript">
+                        document.write("<h3>No of nodes: " + spiderJsonFull.nodes.length +"</h3>");
+                        document.write("<h3>No of links: " + spiderJsonFull.links.length +"</h3>");
+                    </script>
+                    <div id="3d-graph"></div>
+                    <script type="text/javascript" src="/static/force_3d.js"></script>
+                </div>
+                {% endif %}
             {% else %}
-                <div class="ui raised segment">
+                <div class="ui raised green segment">
                     <h2 class="ui center aligned header">Parameters to compute page rank</h2>
                     <div class="ui basic segment"></div>
                     <form class="ui form success" action="/index" method="post">
