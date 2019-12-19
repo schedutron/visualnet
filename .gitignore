@@ -1,11 +1,7 @@
-spider.js
-*.sqlite
+*.model
 .vscode/
+.venv
 venv/
-.DS_Store
-__pycache__/
-env/
+node_modules
+spider.sqlite
 *.graph
-iitb_network.model
-node_modules/
-*.pyc

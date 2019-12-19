@@ -16,9 +16,9 @@ def index():
     if request.method == 'POST':
         try:
             web_url = request.form["webUrl"]
-            num_pages = request.form["numPages"]
-            num_iter = request.form["iterno"]
-            node_iter = request.form["itno"]
+            num_pages = int(request.form["numPages"])
+            num_iter = int(request.form["iterno"])
+            node_iter = int(request.form["itno"])
             # Add URL Validation
             flash('Process started!', 'success')
             spider_func(web_url, num_pages)
@@ -34,10 +34,10 @@ def index():
 
         try:
             web_url_node = request.form["webUrlnode"]
-            perpexi = request.form["perp"]
-            embed_dimm = request.form["emb"]
-            walk_length = request.form["node"]
-            num_walks = request.form["walk"]
+            perpexi = int(request.form["perp"])
+            embed_dimm = int(request.form["emb"])
+            walk_length = int(request.form["node"])
+            num_walks = int(request.form["walk"])
             # Add URL Validation
             flash('Visualizing Node Embedings!', 'success')
             spider_node_func(

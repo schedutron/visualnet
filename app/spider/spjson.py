@@ -24,7 +24,7 @@ def spjson_func(domain, howmany):
         WHERE html IS NOT NULL AND ERROR IS NULL AND web_id = :wi
         GROUP BY id ORDER BY id,inbound''', {"wi": web_id})
 
-    fhand = open('spider/spider.js','w')
+    fhand = open('app/spider/spider.js','w')
     nodes = list()
     maxrank = None
     minrank = None
