@@ -1,4 +1,4 @@
-var width = 600,
+var width = 1000,
     height = 600;
 
 var color = d3.scale.category20();
@@ -67,4 +67,4 @@ function loadData(json) {
   });
 
 }
-loadData(spiderJson);
+loadData(spiderJson=spiderJson);

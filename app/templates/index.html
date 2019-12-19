@@ -14,43 +14,55 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <div class="ui raised segment">
+        <div class="ui segment">
             <h1 class="ui center aligned header">The Visual Net</h1>
             {% if result %}
-                <div class="ui container">
-                    <script>
-                        document.write("<p>Starting url: "+spiderJson.nodes[0].url+"</p>");
+                <script type="text/javascript" src="/static/d3.v2.js"></script>
+                <script type="text/javascript" src="/static/spider.js"></script>
+                <link type="text/css" rel="stylesheet" href="/static/force.css"/>
+                <div id="chart" class="ui raised segment">
+                    <script type="text/javascript">
+                        document.write("<h3 class='ui center aligned header'>Domain: "+ spiderJson.nodes[0].url +"</h3>");
                     </script>
-                    <script type="text/javascript" src="/static/force.js"></script>
                 </div>
-                <form class="ui form success" action="/index" method="post">
-                    <label>Enter a Web URL</label>
-                    <p><input type="url" id="webUrlnode" name="webUrlnode" required/></p>
-                    <label>Enter Perpexipility</label>
-                    <p><input type="number" id="perp" name="perp" required/></p>
-                    <label>Enter Embedding dimensions</label>
-                    <p><input type="number" id="emb" name="emb" required/></p>
-                    <label>Enter Number of nodes in each walk</label>
-                    <p><input type="number" id="node" name="node" required/></p>
-                    <label>Enter Number of walks per node</label>
-                    <p><input type="number" id="walk" name="walk" required/></p>
+                <script type="text/javascript" src="/static/force.js"></script>
+
+                <div class="ui raised segment">
+                    <h2 class="ui center aligned header">Hyperparameters to compute embeddings</h2>
                     <div class="ui basic segment"></div>
-                    <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
-                </form>
-                <button class="ui green button" onclick="window.location.href='/'">Check Another Visual Net</button>
+                    <form class="ui form success" action="/index" method="post">
+                        <label>Enter a Web URL</label>
+                        <p><input type="url" id="webUrlnode" name="webUrlnode" required/></p>
+                        <label>Enter Perpexipility</label>
+                        <p><input type="number" id="perp" name="perp" required/></p>
+                        <label>Enter Embedding dimensions</label>
+                        <p><input type="number" id="emb" name="emb" required/></p>
+                        <label>Enter Number of nodes in each walk</label>
+                        <p><input type="number" id="node" name="node" required/></p>
+                        <label>Enter Number of walks per node</label>
+                        <p><input type="number" id="walk" name="walk" required/></p>
+                        <div class="ui basic segment"></div>
+                        <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
+                    </form>
+                    <button class="ui green button" onclick="window.location.href='/'">Check Another Visual Net</button>
+                </div>
             {% else %}
-                <form class="ui form success" action="/index" method="post">
-                    <label>Enter a Web URL</label>
-                    <p><input type="url" id="webUrl" name="webUrl" required/></p>
-                    <label>Enter no. of Pages</label>
-                    <p><input type="number" id="numPages" name="numPages" required/></p>
-                    <label>Enter no. of Iterations</label>
-                    <p><input type="number" id="iterno" name="iterno" required/></p>
-                    <label>Enter no. of Nodes</label>
-                    <p><input type="number" id="itno" name="itno" required/></p>
+                <div class="ui raised segment">
+                    <h2 class="ui center aligned header">Parameters to compute page rank</h2>
                     <div class="ui basic segment"></div>
-                    <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
-                </form>
+                    <form class="ui form success" action="/index" method="post">
+                        <label>Enter a Web URL</label>
+                        <p><input type="url" id="webUrl" name="webUrl" required/></p>
+                        <label>Enter no. of Pages</label>
+                        <p><input type="number" id="numPages" name="numPages" required/></p>
+                        <label>Enter no. of Iterations</label>
+                        <p><input type="number" id="iterno" name="iterno" required/></p>
+                        <label>Enter no. of Nodes</label>
+                        <p><input type="number" id="itno" name="itno" required/></p>
+                        <div class="ui basic segment"></div>
+                        <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
+                    </form>
+                </div>
             {% endif %}
             {% if error %}
                 <div class="ui error message">

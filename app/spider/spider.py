@@ -8,8 +8,8 @@ import requests
 from sqlalchemy.exc import IntegrityError
 from app import db
 
-print("We are in spider")
 """
+print("We are in spider")
 if len(sys.argv) < 3:
     print("Usage: python3 -m spider.spider http://some.doma.in num_pages")
     quit()

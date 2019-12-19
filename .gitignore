@@ -2,6 +2,9 @@
 .vscode/
 .venv
 venv/
+env/
 node_modules
 spider.sqlite
 *.graph
+*.pyc
+__pycache__/

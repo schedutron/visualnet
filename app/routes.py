@@ -7,7 +7,7 @@ from app import app
 from app.spider.spider import spider_func
 from app.spider.sprank import sprank_func
 from app.spider.spjson import spjson_func
-from app.spider.spider_node import spider_node_func
+from app.spider.compute_embeddings import compute_embeddings
 
 
 @app.route('/')
@@ -20,14 +20,10 @@ def index():
             num_iter = int(request.form["iterno"])
             node_iter = int(request.form["itno"])
             # Add URL Validation
-            flash('Process started!', 'success')
             spider_func(web_url, num_pages)
-            flash('Scrapped the Pages!', 'success')
-            flash('Page Rank Calculation Started!', 'success')
             sprank_func(domain=web_url, num_iterations=num_iter)
-            flash('Page Rank Calculation Ended!', 'success')
-            flash('Visualizing Graph!', 'success')
             spjson_func(domain=web_url, howmany=node_iter)
+            flash('Visualizing Graph!', 'success')
             return render_template('index.html', title='Home', result=True)
         except KeyError:
             web_url = None
@@ -40,7 +36,7 @@ def index():
             num_walks = int(request.form["walk"])
             # Add URL Validation
             flash('Visualizing Node Embedings!', 'success')
-            spider_node_func(
+            compute_embeddings(
                 domain=web_url_node,
                 perpex=perpexi,
                 embed_dimm=embed_dimm,
