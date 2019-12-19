@@ -20,7 +20,7 @@ def compute_embeddings(url, embedding_dimensions, walk_length=10, num_walks=90, 
 
     g = nx.MultiDiGraph()
     for node in nodes_db:
-        g.add_node(node["id"], url=node[1], old_rank=np.float64(node[2]), new_rank=np.float64(node[3]))
+        g.add_node(node["id"], id=node[0], url=node[1], old_rank=np.float64(node[2]), new_rank=np.float64(node[3]))
     for edge in links_db:
         g.add_edge(*edge)
 
@@ -32,3 +32,4 @@ def compute_embeddings(url, embedding_dimensions, walk_length=10, num_walks=90, 
     nx.write_gpickle(g, f"app/spider/{dom}_network.graph")
     print("Graph and corresponding embedding model saved")
     # ... return some stats later
+    return g, model

@@ -2,7 +2,7 @@
     <style> body { margin: 0; } </style>
   
     <script src="http://unpkg.com/3d-force-graph"></script>
-    <script src="../app/spider/spiderFull.js"></script>
+    <script src="../app/spider/iitk.ac.in.spiderFull.js"></script>
     <!--<script src="../../dist/3d-force-graph.js"></script>-->
 </head>
 
@@ -28,11 +28,18 @@
       // }
       const gData = spiderJson;
 
-      // gData["links"] = gData["links"].map(link => ({
-      //   source: gData.nodes[link.source],
-      //   target: gData.nodes[link.target],
-      //   value: link.value
-      // }));
+      gData["nodes"] = gData["nodes"].map(node => ({
+        id: node.id,
+        url: node.url,
+        old_rank: node.old_rank,
+        new_rank: node.new_rank
+      }));
+
+      gData["links"] = gData["links"].map(link => ({
+        source: gData.nodes.find(node => node.id === link.source.id),
+        target: gData.nodes.find(node => node.id === link.target.id),
+        value: 3
+      }));
 
       const Graph = ForceGraph3D()
       (document.getElementById('3d-graph'))
