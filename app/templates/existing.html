@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="ui container">
+    <div class="ui tertiary teal inverted segment">
+        <h1 class="ui center aligned header">The Visual Net</h1>
+        <div class="ui raised green segment">
+            <form class="ui form" action="/existing" method="post">
+                <label>Previous Web URLs</label>
+                {% for link in web_urls %}
+                    <li>{{link}}</li>
+                {% endfor %}
+                <p><input id="link" name="link" required/></p>
+                <div class="ui basic segment"></div>
+                <p><input type="submit" id="submit" class="ui submit green button" value="Submit"/></p>
+            </form>
+        </div>
+
+        {% if graph_show %}
+        <div class="ui inverted segment">
+            <script src="http://unpkg.com/3d-force-graph"></script>
+            <script src="/static/{{file_path}}.spiderFull.js"></script>
+            <link type="text/css" rel="stylesheet" href="/static/style.css"/>
+            <script type="text/javascript">
+                document.write("<h3>No of nodes: " + spiderJsonFull.nodes.length +"</h3>");
+                document.write("<h3>No of links: " + spiderJsonFull.links.length +"</h3>");
+            </script>
+            <div id="3d-graph"></div>
+            <script type="text/javascript" src="/static/force_3d.js"></script>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

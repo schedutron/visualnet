@@ -4,6 +4,7 @@ from subprocess import check_call, Popen, call
 import re, os, sys
 
 from app import app
+from app import db
 from app.spider.spider import spider_func
 from app.spider.sprank import sprank_func
 from app.spider.spjson import spjson_func
@@ -54,3 +55,19 @@ def index():
         return render_template('index.html', error=error, result=False)
     else:
         return render_template('index.html', result=False)
+
+@app.route('/existing', methods=['GET', 'POST'])
+def view_existing():
+    web_urls = [row[0].split('/')[2] for row in db.session.execute(
+            'SELECT url from webs'
+        ).fetchall()]
+
+    if request.method == 'GET':
+        return render_template('existing.html', web_urls=web_urls)
+
+    elif request.method == 'POST':
+        link = request.form["link"]
+        return render_template('existing.html', web_urls=web_urls, graph_show=True, file_path=link)
+
+    else:
+        return render_template('existing.html', web_urls=web_urls)
