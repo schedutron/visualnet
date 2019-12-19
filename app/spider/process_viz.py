@@ -5,7 +5,7 @@ import networkx as nx
 import numpy as np
 from sklearn.manifold import TSNE
 
-def get_viz(g, model, perplexity=20):
+def get_viz(url, g, model, perplexity=20):
     """Performs processing for network visualization"""
     nodes = [x for x in model.wv.vocab]
     embeddings = np.array([model.wv[x] for x in nodes])
@@ -32,7 +32,8 @@ def get_viz(g, model, perplexity=20):
         list(nodes_dict.values()), key=lambda node: node["id"]
         )
     spider_json_full = {"nodes": nodes_output_list, "links": edges}
-    fname = f"app/spider/{dom}.spiderFull.js"
+    dom = url.split('/')[2]
+    fname = f"app/static/{dom}.spiderFull.js"
     with open(f"{fname}", "w") as f:
         f.write("spiderJson = ")
         f.write(json.dumps(spider_json_full, indent=2))

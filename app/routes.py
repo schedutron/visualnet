@@ -8,7 +8,7 @@ from app.spider.spider import spider_func
 from app.spider.sprank import sprank_func
 from app.spider.spjson import spjson_func
 from app.spider.compute_embeddings import compute_embeddings
-
+from app.spider.process_viz import get_viz
 
 @app.route('/')
 @app.route('/index', methods=['GET', 'POST'])
@@ -30,19 +30,21 @@ def index():
 
         try:
             web_url_node = request.form["webUrlnode"]
-            perpexi = int(request.form["perp"])
+            perplex = int(request.form["perp"])
             embed_dimm = int(request.form["emb"])
             walk_length = int(request.form["node"])
             num_walks = int(request.form["walk"])
+            window_size = int(request.form["window_size"])
             # Add URL Validation
-            flash('Visualizing Node Embedings!', 'success')
-            compute_embeddings(
-                domain=web_url_node,
-                perpex=perpexi,
-                embed_dimm=embed_dimm,
-                walk_length=walk_length,
-                num_walks=num_walks
-            )
+            g, model = compute_embeddings(
+                            url=web_url_node,
+                            embedding_dimensions=embed_dimm,
+                            walk_length=walk_length,
+                            num_walks=num_walks,
+                            window_size=window_size
+                        )
+            flash('Embedings Computed, Processing Visualizations!', 'success')
+            get_viz(web_url_node, g, model, perplex=perplex)
             return render_template('index.html', title='Home', result=True)
         except KeyError:
             web_url_node = None

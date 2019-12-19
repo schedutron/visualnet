@@ -1,13 +1,14 @@
 import networkx as nx, numpy as np
+from node2vec import Node2Vec
 from app import db
 
-def compute_embeddings(url, embedding_dimensions, walk_length=10, num_walks=90, window_size=9):
+def compute_embeddings(url, embedding_dimensions=10, walk_length=10, num_walks=90, window_size=9):
     res = db.session.execute("SELECT id FROM webs WHERE url = :url", {"url": url})
     rows = res.fetchall()
     if rows == []:
         print("No such domain found")
         return
-    web_url = rows[0][0]
+    web_id = rows[0][0]
 
     nodes_res = db.session.execute("SELECT id, url, old_rank, new_rank FROM pages WHERE web_id = :wi", {"wi": web_id})
     nodes_db = nodes_res.fetchall()
