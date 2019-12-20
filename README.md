@@ -1,6 +1,6 @@
-# pagerank2
+# VisualNet
 
-My site visualization repository built with implementation help by Dr Chuck's tutorials.
+Site visualization source repository for our bachelors' degree project, built upon early Dr Chuck's tutorials.
 
 ScriptFlow:
 
