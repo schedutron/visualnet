@@ -7,3 +7,7 @@ Site visualization source repository for our bachelors' degree project, extended
 ## Demo 3D Visualization of a Website Network
 
 ![3D Network Visualization Demo](demo.gif)
+
+***
+### TODO
+Explore deck.gl as an alternative visualization library
